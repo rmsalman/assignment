@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8" />
+    <title>Bayt</title>
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+
+    <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link
+      rel="stylesheet"
+      href="https://csscf.b8cdn.com/bayt/assets/baytui-1.71.0-c1/css/B8.css"
+    />
+    <link rel="stylesheet" href="assets/css/custom.css" />
+  </head>
+
+  <body>
+    <div class="progresor-container">
+      <div class="progresor"></div>
+    </div>
+    <div class="loading-backdrop">
+      <div class="loading"></div>
+    </div>
+    <!-- Primary Page Layout
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <div class="box is-wide row is-reversed-d is-collapsed-m">
+      <section
+        class="col is-9-d is-half sticky-sense is-light u-none"
+        id="jsMiniJobView"
+      >
+        <div id="formToggleSheet">
+          <!-- Job Vi	ew-->
+          <div id="view_inner">
+            <div class="card is-primary has-scroll">
+              <div class="card-head">
+                <a
+                  class="b-close u-right d"
+                  href="javascript:;"
+                  onclick="hideCv()"
+                ></a>
+                <div class="media" id="cv"></div>
+              </div>
+
+              <div
+                class="card-content t-small bt p20"
+                data-style="max-height: 121px;"
+                id="cvContent"
+              ></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="col is-9-d sticky-sense" id="jsMainListingContainer">
+        <div class="sticky-sidebar" data-sticky-sidebar>
+          <!-- Job Results-->
+          <div id="results_inner" class="sticky-content">
+            <!-- Job Results-->
+            <div class="card p0b">
+              <div id="results_inner_card" class="card-content">
+                <ul
+                  class="media-list in-card is-spaced is-divided is-reversed has-hover-d has-rects has-free-img bb"
+                  id="mainContent"
+                ></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="col is-3-d sticky-sense" id="jsMainClusterContainer">
+        <div class="sticky-sidebar" data-sticky-sidebar>
+          <div class="sticky-content">
+            <div class="card is-primary-d is-compact p0">
+              <div class="card-content">
+                <div class="can-toggle" data-toggle-sheet="#filter">
+                  <div class="toggle-head">
+                    <a
+                      href="javascript:;"
+                      class="b-close m"
+                      data-close-sheet
+                    ></a>
+                    <div>
+                      <i class="icon is-filter t-large"></i>
+                      <b class="t-large ">Filter</b>
+                    </div>
+                    <span class="m"> </span>
+                  </div>
+                  <div class="toggle-content">
+                    <div class="accordion t-small" id="sideBar"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="assets/js/echo.min.js"></script>
+    <script async src="assets/js/main.js"></script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+.progresor-container {
+  visibility: hidden;
+  color: #000 !important;
+  background-color: #f1f1f1 !important;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  transition: all 0s;
+}
+.progresor {
+  color: #000 !important;
+  background-color: #2784fc !important;
+  height: 5px;
+  width: 5%;
+  transition: width 2s;
+}
+.progresor-progress {
+  visibility: initial;
+}
+.progresor-progress .progresor {
+  width: 75%;
+}
+.progresor-progress-done .progresor {
+  width: 100%;
+}
+
+.loading {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+}
+
+.loading-backdrop,
+.loading {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  background: white;
+  z-index: 9;
+  text-align: center;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-backdrop {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  background: white;
+  z-index: 9;
+  text-align: center;
+}
