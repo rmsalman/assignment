@@ -35,35 +35,61 @@
         class="col is-9-d is-half sticky-sense is-light u-none"
         id="jsMiniJobView"
       >
-        <div id="formToggleSheet">
+        <div id="formToggleSheet" class="sticky-sidebar" data-sticky-sidebar>
           <!-- Job Vi	ew-->
-          <div id="view_inner">
-            <div class="card is-primary has-scroll">
-              <div class="card-head">
-                <a
-                  class="b-close u-right d"
-                  href="javascript:;"
-                  onclick="hideCv()"
-                ></a>
-                <div class="media" id="cv"></div>
+          <div class="sticky-content">
+            <div id="view_inner">
+              <div class="card is-primary has-scroll" id="cvContent">
+                <div class="card-head" id="cardHead">
+                  <a
+                    class="b-close u-right d"
+                    href="javascript:;"
+                    onclick="hideCv()"
+                  ></a>
+                  <div class="media card-content " id="cv"></div>
+                </div>
+                <div
+                  class="card-content t-small bt p20"
+                  id="cvContentDetail"
+                  style="max-height: 50vh;"
+                ></div>
               </div>
-
-              <div
-                class="card-content t-small bt p20"
-                data-style="max-height: 121px;"
-                id="cvContent"
-              ></div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="col is-9-d sticky-sense" id="jsMainListingContainer">
-        <div class="sticky-sidebar" data-sticky-sidebar>
+      <section class="col is-9-d " id="jsMainListingContainer">
+        <div class="sticky-sidebar">
           <!-- Job Results-->
-          <div id="results_inner" class="sticky-content">
+          <div id="results_inner">
             <!-- Job Results-->
+
+            <div id="SearchedContent" class="card p0b" style="display: none;">
+              <div class="card-content">
+                <div class="card-head" id="cardHead" style="overflow: hidden;">
+                  <h2 class="h5 u-left " id="SearchedContent_h"></h3>
+                  <a
+                    class="b-close u-right d"
+                    href="javascript:;"
+                    onclick="hideJobKeyword()"
+                  ></a>
+                  <div class="clearfix"></div>
+                </div>
+
+                <ul
+                  class="media-list in-card is-spaced is-divided is-reversed has-hover-d has-rects has-free-img bb"
+                  id="SearchedContent_ul"
+                ></ul>
+              </div>
+            </div>
+
             <div class="card p0b">
+              <div class="card-head">
+                <h1 class="h5">
+                  Searched For: <i id="searchedKeyWord"></i>
+                </h3>
+              </div>
               <div id="results_inner_card" class="card-content">
                 <ul
                   class="media-list in-card is-spaced is-divided is-reversed has-hover-d has-rects has-free-img bb"
@@ -94,6 +120,24 @@
                     <span class="m"> </span>
                   </div>
                   <div class="toggle-content">
+                    <div class="accordion-title">
+                      <div class="has-icon m10t">
+                        <input
+                          name="keyword"
+                          type="search"
+                          class="input is-small u-expanded"
+                          placeholder="Search"
+                          value="manager"
+                          id="filterSearchInput"
+                        />
+                        <button
+                          id="filterSearchButton"
+                          type="submit"
+                          class="btn is-clear icon is-search p10y p10l p0r"
+                        ></button>
+                      </div>
+                    </div>
+
                     <div class="accordion t-small" id="sideBar"></div>
                   </div>
                 </div>
@@ -104,10 +148,57 @@
       </aside>
     </div>
 
+    <input type="hidden" id="row" value="0" />
+    <input type="hidden" id="all" value="25" />
+    <script>
+      B8v = {
+        domainType: "jobs",
+        cookiesDomain: ".bayt.com",
+        devProjects: {
+          baytUI: 1,
+          generic: 0,
+          yiiBetaAndDev: 0,
+          new_email_confirmation_considration: 0,
+          hr_communities_new: 1,
+          baytUIProfile: 1,
+          cv_refreshness_project: 1,
+          shagheel_domain: 1,
+          job_post_baytui: 1,
+          jsMicroCvBuilder: 1,
+          thirdColumnOfSearchJobForLoggedIn: 1,
+          newWhatsappFlow: 1,
+          mobileConfirmationNewFixs: 1,
+          freemium_project: true
+        },
+        pageCached: true,
+        saveNav: false,
+        csrf: { token: "075fbbbecb005c7f2ed10fbce320f289ab43681d" },
+        baytUiNavigation: {
+          mode: "jsLogout",
+          list: "jobsLoggedOut",
+          links: {
+            upg: "https:\/\/www.bayt.com\/en\/premium\/?native_source=Top-bar",
+            prm:
+              "https:\/\/www.bayt.com\/en\/myworkspace-j\/elite-premium-account\/"
+          },
+          confirmationMsgs: {
+            undeliverable:
+              '<h5>Employers Can\'t Contact You!<\/h5> We tried to send you an email but it seems that your email address is incorrect. Change your email address by <a href="https:\/\/www.bayt.com\/en\/mycvs\/#contact">clicking here<\/a>.',
+            risky:
+              "<h5>Employers Can't Contact You!<\/h5> You need to confirm your email address before you can appear in the employer search. <a href=\"javascript:;\" onclick=\"B8.ajax('\/app\/control\/byt_reg_manager',{data: {byt_reg_stage:45,withMessage:1},success:function(data){B8.push('Email sent, please check your inbox.');}});\">Click here<\/a> to send the confirmation email.",
+            unknown:
+              "<h5>Employers Can't Contact You!<\/h5> We've sent you a confirmation email. Log in to your email and follow the instructions to confirm. Didn't get the email? <a href=\"javascript:;\" onclick=\"B8.ajax('\/app\/control\/byt_reg_manager',{data: {byt_reg_stage:45,withMessage:1},success:function(data){B8.push('Email sent, please check your inbox.');}});\"> Send it again. <\/a>"
+          }
+        }
+      };
+    </script>
+
     <!-- End Document
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-    <script src="assets/js/echo.min.js"></script>
+    <script src="assets/js/B8com.js"></script>
+    <script>
+      B8.init();
+    </script>
     <script async src="assets/js/main.js"></script>
   </body>
 </html>

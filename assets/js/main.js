@@ -1,33 +1,83 @@
-
 // variables start
 var API_JOBS = "APIs/API-JOBS.php"
 var API_CV = "APIs/API-CV.php"
 // variables end
 
-// helpers start
 
-function toggler(thisId) {
-    thisId = $('#' + thisId);
-    thisId.next().removeClass('u-none');
-    thisId.hide();
-    console.log(thisId);
+
+// helpers start
+function toggler(thisId, nextId) {
+    console.log(thisId, nextId)
+    B8.remClass('u-none', B8.get('#' + nextId));
+    B8.get('#' + thisId).style = "display:none";
 }
+
 
 function hideCv() {
-    $('#jsMiniJobView').addClass('u-none');
-    $('#jsMainListingContainer').removeClass('is-half');
+    B8.addClass('u-none', B8.get('#jsMiniJobView'));
+    B8.remClass('is-half', B8.get('#jsMainListingContainer'));
 }
 
-const makeRequest = async (method, url, done) => {
-    var xhr = new XMLHttpRequest();
-    xhr.open(method, url);
-    xhr.onload = function () {
-        done(null, xhr.response);
-    };
-    xhr.onerror = function () {
-        done(xhr.response);
-    };
-    xhr.send();
+
+function removeLoading() {
+    B8.addClass('progresor-progress-done', B8.get('.progresor-container'));
+    setTimeout(() => {
+        B8.remClasses(B8.get('.progresor-container'), 'progresor-progress', 'progresor-progress-done');
+    }, 2000)
+}
+
+
+function findInUrl(findKey) {
+    var urlHash = location.hash.split('#')[1];
+    if (typeof urlHash !== 'undefined') {
+        var key = '';
+        urlHash = urlHash.split('&').filter(k => {
+            key = k.split('=');
+            if (key[0] == findKey) {
+                return key
+            }
+        })
+        return urlHash.length > 0 ? urlHash[0].split('=')[1] : false;
+    }
+}
+
+
+isPage = param => {
+    var urlReplace = location.hash.split('#')[1];
+    if (typeof urlReplace !== 'undefined') {
+        urlReplace = urlReplace.split('&');
+        if (urlReplace.indexOf(param) == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+replaceUrl = (paramKey, paramValue) => {
+    var urlReplace = location.hash.split('#')[1];
+    if (typeof urlReplace !== 'undefined') {
+
+        if (urlReplace.split('&') == urlReplace) {
+            urlReplace = [urlReplace, paramKey + '=' + paramValue];
+        } else {
+            urlReplace = urlReplace.split('&')
+        }
+
+    }
+    else {
+        urlReplace = [paramKey + '=' + paramValue];
+    }
+
+    urlReplace = urlReplace.map(k => {
+        var splits = k.split('=');
+        splits[1] = splits[0] == paramKey ? paramValue : splits[1];
+        return splits.join('=');
+    })
+
+    urlReplace = urlReplace.join('&');
+    window.location.hash = urlReplace;
 }
 
 
@@ -74,7 +124,7 @@ function ageCounter(ages) {
 // helpers end
 
 // Renderers Start
-const sidebarRenderer = (Sidefor, arr) => {
+const sidebarRenderer = (Sidefor, arr, keyword) => {
     var sideStart = `<input
                      id="${Sidefor}"
                      class="accordion-toggle"
@@ -96,13 +146,14 @@ const sidebarRenderer = (Sidefor, arr) => {
 
         if (i == 4) {
             li += (`</ul>
-            <span id="extra_${i}" onclick="toggler('extra_${i}')" ><a href="javascript:;" class="is-gray t-xsmall p0">
+            <span id="${Sidefor + i}" onclick="toggler('${Sidefor + i}', '${Sidefor + i + i}')" ><a href="javascript:;" class="is-gray t-xsmall p0">
                 <span>Show More</span>
-           </a></span><ul class="list is-basic is-spaced is-compact t-small m0 u-none">`);
+           </a></span><ul id="${Sidefor + i + i}" class="list is-basic is-spaced is-compact t-small m0 u-none">`);
         }
 
         li += (`<li data-i='${i}' class="t-small">
                      <a
+                       ${(Sidefor !== 'Age' ? `onclick="jobKeyword('${v[0]}')"` : '')}
                        href="javascript:;"
                        class="jsAjaxLoad"
                      >${v[0]}</a> &nbsp; <span class="t-mute">(${v[1]})</span>
@@ -122,7 +173,7 @@ const mainContentRenderer = (arr) => {
         let { photo_url, cv_id, icode, first_name, last_name, age, experince_title } = v;
         li += (`<li>
                       <div>
-                        <img src="assets/images/1x1.png"  data-echo="${photo_url}"  class="img-70 u-right m10l" alt="${first_name + ' ' + last_name}" title="${first_name + ' ' + last_name}">
+                        <img src="${photo_url}"  class="img-70 u-right m10l" alt="${first_name + ' ' + last_name}" title="${first_name + ' ' + last_name}">
                         <h2 class="m0 t-regular">
                           <a onClick="viewCV('${cv_id}', '${icode}')" href="javascript:;">${first_name}</a>
                         </h2>
@@ -139,7 +190,7 @@ function cvContent(heading, obj, find) {
     let content = '';
     obj.forEach(k => {
         if (k[find] !== '') {
-            content += '<dd>' + k[find] + '</dd>'
+            content += '<div>' + k[find] + '</div>'
         }
     })
 
@@ -148,17 +199,13 @@ function cvContent(heading, obj, find) {
     }
 
     return `<h2 class="h6 p10t">${heading}</h2>
-    <dl class="dlist is-spaced is-fitted t-small m0">
-        <div>
         ${content}
-        </div>
-    </dl>
     `;
 }
 
 function cvHeader(obj) {
     let { photo_info, first_names, date_modified } = obj
-    return `<img src="assets/images/1x1.png" data-echo="${photo_info}" alt="Bank of Jordan logo" title="Bank of Jordan logo" class="img-70 u-left-m">
+    return `<img data-ssrc="assets/images/1x1.png" src="${photo_info}" alt="Bank of Jordan logo" title="Bank of Jordan logo" class="img-70 u-left-m">
     <div>
         <h2 class="t-large">${first_names}</h2>
         <ul class="list is-basic t-small">
@@ -171,7 +218,6 @@ function cvHeader(obj) {
     </div>
     `;
 }
-
 // Renderes end 
 
 
@@ -179,15 +225,18 @@ function cvHeader(obj) {
 function viewCV(cv_id, icode) {
     console.log('cv_id: ', cv_id, 'icode: ', icode);
 
-    $('.progresor-container').addClass('progresor-progress');
 
-    makeRequest('GET', API_CV + '/?cv_id=' + cv_id + '&icode=' + icode, function async(err, data) {
-        if (err) { throw err; }
+    B8.ajax(API_CV + '/?cv_id=' + cv_id + '&icode=' + icode, { method: 'GET' }).success(function (data, xhr) {
 
         data = JSON.parse(data);
-        console.log('CV:', data);
-        window.cvz = data;
-        $('.progresor-container').addClass('progresor-progress-done');
+        console.log('cv:', data);
+        window.cv = data;
+
+        if (typeof data.cv_training == 'undefined') {
+            alert(data.status)
+            removeLoading();
+            return
+        }
 
         let { cv_training, cv_education, cv_hobbies, cv_memberships } = data
         let cv_training_values = Object.values(cv_training);
@@ -207,40 +256,160 @@ function viewCV(cv_id, icode) {
 
         let cv_membership_organization = cvContent('Organization Name', cv_memberships_values, 'organization_name');
         let cv_membership_role = cvContent('Membership Role', cv_memberships_values, 'membership_role');
+        var allhtml = cv_training_type + cv_training_institute + cv_education_institution + cv_education_degree + cv_education_major + cv_hobbies_hobby + cv_hobbies_accomplishments + cv_membership_organization + cv_membership_role;
 
-        $('#cvContent').html(cv_training_type + cv_training_institute + cv_education_institution + cv_education_degree + cv_education_major + cv_hobbies_hobby + cv_hobbies_accomplishments + cv_membership_organization + cv_membership_role);
-        $('#cv').html(cvHeader(data));
-        $('#jsMiniJobView').removeClass('u-none');
-        $('#jsMainListingContainer').addClass('is-half');
-        $('.progresor-container').removeClass('progresor-progress');
-        $('.progresor-container').removeClass('progresor-progress-done');
-        echo.init();
+        const parse = Range.prototype.createContextualFragment.bind(document.createRange());
+        if (document.getElementById('cvHead') !== null) {
+            document.getElementById('cvHead').remove()
+        }
+        if (document.getElementById('cvContentDetail_data') !== null) {
+            document.getElementById('cvContentDetail_data').remove()
+        }
+
+        document.getElementById('cardHead').append(parse('<div class="media" id="cvHead">' + cvHeader(data) + '</div>'))
+        document.getElementById('cvContentDetail').append(parse('<div id="cvContentDetail_data">' + allhtml + '</div>'))
+
+        B8.remClass('u-none', B8.get('#jsMiniJobView'));
+        B8.addClass('is-half', B8.get('#jsMainListingContainer'));
+        removeLoading();
+    }).error(function (xhr, reason) {
+        alert('Oops! ' + reason + '.')
+        console.log('Oops! ' + reason + '.');
+        removeLoading();
     })
 }
 
 
+const pageRenderer = (API_JOBS, resetPage = false, paginate = false) => {
+    B8.addClass('progresor-progress', B8.get('.progresor-container'));
+    console.log('API_JOBS', API_JOBS);
 
-makeRequest('GET', API_JOBS, function async(err, data) {
-    if (err) { throw err; }
+    B8.ajax(API_JOBS, { method: 'GET' }).success(function (data, xhr) {
 
-    if (data == '') {
-        $('body').html('Sorry Data not found');
-        return;
-    }
+        if (data == '') {
+            B8.get('body').innerHtml = 'Sorry Data not found';
+            return;
+        }
 
-    data = JSON.parse(data).result;
-    console.log('Jobs: ', data);
-    window.jobs = data;
+        data = JSON.parse(data);
 
-    let filterAges = mapToProp(data, 'age');
-    let filterExp = Object.entries(mapToProp(data, 'experince_title'));
-    filterAges = ageCounter(filterAges);
+        if (typeof data.result == 'undefined') {
+            alert(data.status)
+            removeLoading();
+            return
+        } else {
+            var jobs = window.jobs;
+            data = data.result;
+            if (paginate) {
+                data = jobs.concat(data);
+            }
+        }
 
-    let sidebar = sidebarRenderer('Age', filterAges) + sidebarRenderer('Experience', filterExp);
-    let mainContent = mainContentRenderer(data)
-    $('#sideBar').html(sidebar);
-    $('#mainContent').html(mainContent);
-    $('.loading-backdrop').hide(500);
-    echo.init()
-});
+        window.jobs = data;
+        console.log('Jobs: ', data);
+
+        let filterAges = mapToProp(data, 'age');
+        let filterExp = Object.entries(mapToProp(data, 'experince_title'));
+        filterAges = ageCounter(filterAges);
+
+        let sidebar = sidebarRenderer('Age', filterAges, 'age') + sidebarRenderer('Experience', filterExp, 'experince_title');
+        let mainContent = mainContentRenderer(data)
+
+        document.getElementById('mainContent').innerHTML = mainContent
+        document.getElementById('sideBar').innerHTML = sidebar;
+
+        if (resetPage == true) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        B8.get('.loading-backdrop').style = 'display:none'
+        B8.addClass('progresor-progress-done', B8.get('.progresor-container'));
+        removeLoading();
+
+    }).error(function (xhr, reason) {
+        alert('Oops! ' + reason + '.')
+        console.log('Oops! ' + reason + '.');
+    });
+}
 // Controllers end
+
+function hideJobKeyword() {
+    B8.get('#SearchedContent').style = "display:none";
+}
+
+function jobKeyword(e) {
+    let newJobs = window.jobs.filter((k, i) => {
+        if (k.experince_title == e) {
+            return k.cv_id
+        }
+    })
+    let mainContent = mainContentRenderer(newJobs)
+
+    B8.get('#SearchedContent').style = "display:block";
+    document.getElementById('SearchedContent_h').innerHTML = 'Filtered: ' + e;
+    document.getElementById('SearchedContent_ul').innerHTML = mainContent;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+
+// Triggers start
+B8.ready(function () {
+
+    var findInUrlVar = findInUrl('page');
+    var page = (findInUrlVar ? findInUrlVar : 1);
+    replaceUrl('page', page);
+
+    findInUrlVar = findInUrl('position_keyword');
+    findInUrlVar = (findInUrlVar ? findInUrlVar : B8.get('#filterSearchInput').value);
+    B8.get('#filterSearchInput').value = decodeURIComponent(findInUrlVar)
+    document.getElementById('searchedKeyWord').innerHTML = decodeURIComponent(findInUrlVar);
+
+    replaceUrl('position_keyword', findInUrlVar);
+
+
+    // FirstPaint of HomePage
+    pageRenderer(API_JOBS + '?page=' + page + '&position_keyword=' + findInUrlVar);
+
+    // on press enter in search input
+    B8.get('#filterSearchInput').onkeyup = (e) => {
+        var code = (e.keyCode ? e.keyCode : e.which);
+        if (code == 13) { //Enter keycode
+            B8.get('#filterSearchButton').click();
+        }
+    };
+
+
+    B8.get('#filterSearchButton').addEventListener('click', () => {
+        hideJobKeyword();
+        const position_keyword = B8.get('#filterSearchInput').value
+        document.getElementById('searchedKeyWord').innerHTML = position_keyword;
+        var url = API_JOBS + '?page=1&position_keyword=' + position_keyword;
+        replaceUrl('position_keyword', position_keyword);
+        replaceUrl('page', 1);
+        pageRenderer(url, true);
+    })
+
+
+
+
+    B8.get('body').onscroll = function () {
+
+
+        var findInUrlVar = findInUrl('page');
+        var page = (findInUrlVar ? findInUrlVar : 1);
+        replaceUrl('page', page);
+
+
+        filterSearchInput = B8.get('#filterSearchInput').value;
+        var position = window.pageYOffset
+        var bottom = document.body.scrollHeight - window.innerHeight;
+
+        if (position == bottom) {
+            var url = 'APIs/API-JOBS.php?' + 'page=' + ++page + '&position_keyword=' + filterSearchInput;
+            pageRenderer(url, false, true);
+            replaceUrl('page', page)
+        }
+
+    };
+});
